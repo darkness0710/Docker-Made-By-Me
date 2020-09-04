@@ -1,0 +1,58 @@
+version: '2'
+
+services:
+    app:
+        volumes:
+            - "./docker_setup/configs/apache2.conf:/etc/apache2/apache2.conf"
+            - "./docker_setup/configs/app.conf:/etc/apache2/sites-enabled/app.conf"
+            - "./docker_setup/configs/php.ini:/etc/php/7.3/apache2/conf.d/custom.ini"
+            - "./docker_setup/configs/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf"
+            - "./:/var/www/"
+        build:
+          context: ./
+          dockerfile: ./docker_setup/app.dockerfile
+        working_dir: /var/www/
+        ports:
+          - 80:80
+          - 443:443
+        environment:
+          APACHE_CONF_DIR: /etc/apache2
+          PHP_CONF_DIR: /etc/php/7.3
+          PHP_DATA_DIR: /var/lib/php
+          OS_LOCALE: en_US.UTF-8
+          DB_PORT: 3306
+          DB_HOST: mysql
+        links:
+            - mysql:mysql
+        privileged: true
+        restart: always
+
+    mysql:
+        image: mysql:5.6
+        volumes:
+          - ./docker_setup/mysql:/var/lib/mysql
+        environment:
+          - "MYSQL_DATABASE=homestead"
+          - "MYSQL_USER=homestead"
+          - "MYSQL_PASSWORD=secret"
+          - "MYSQL_ROOT_PASSWORD=secret"
+        ports:
+            - "3306:3306"
+
+    adminer:
+        image: adminer:latest
+        restart: always
+        ports:
+          - 8080:8080
+
+    node:
+        image: node:8
+        environment:
+          - NODE_ENV=development
+        restart: always
+        volumes:
+          - ./:/var/www/app
+        tty: true
+        ports:
+          - "4000:4000"
+        working_dir: /var/www/app
