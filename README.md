@@ -1,1 +1,2 @@
-All docker by Darkness 0710!
+List dockerfile support for:
+- Laravel
