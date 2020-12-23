@@ -1,2 +1,3 @@
 List dockerfile support for:
-- Laravel
+- Laravel + Mysql + Adminer
+- Wordpress + Mysql
